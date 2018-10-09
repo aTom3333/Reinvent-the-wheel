@@ -1,0 +1,25 @@
+dist: trusty
+sudo: false
+language: cpp
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+      
+      
+before_install:
+  - pip install --user cpp-coveralls
+
+script:
+  - CXX=/usr/bin/g++-7 CC=/usr/bin/gcc-7 
+  - mkdir build && cd build
+  - cmake .. -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug
+  - cmake --build .
+  - ../bin/Debug/variantTest
+  
+  
+after_success:
+  - coveralls --root .. -E ".*catch.*" -E ".*extern.*" -E ".*CMakeFiles.*"
