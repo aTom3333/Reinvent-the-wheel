@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.9)
 project(reinvent_the_wheel
         VERSION 1.0
         DESCRIPTION "A anecdotical project where I reimplement some elements of the standard library"
