@@ -137,6 +137,7 @@ namespace rtw::detail
             base::index = variant_npos;
             base::storage.move(std::move(other.storage), other.index);
             base::index = other.index;
+            other.index = variant_npos;
         }
 
         constexpr move_constructible_variant_underlying_data& operator=(const move_constructible_variant_underlying_data&)
@@ -241,6 +242,7 @@ namespace rtw::detail
             base::index = variant_npos;
             base::storage.move(std::move(other.storage), other.index);
             base::index = other.index;
+            other.index = variant_npos;
             
             return *this;
         }

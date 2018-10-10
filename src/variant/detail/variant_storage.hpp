@@ -66,7 +66,6 @@ namespace rtw::detail
         {                                                                       \
             ::new (&first) T{std::move(other.first)};                           \
             other.destroy(i);                                                   \
-            other.index = variant_npos;                                         \
         }                                                                       \
         else                                                                    \
             rest.move(std::move(other.rest), i);                                \
