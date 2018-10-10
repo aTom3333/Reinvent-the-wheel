@@ -72,7 +72,7 @@ TEST_CASE("noexcept inheritance")
     {
         SECTION("Test the test")
         {
-            REQUIRE(std::is_nothrow_default_constructible_v<std::string>);
+            //REQUIRE(std::is_nothrow_default_constructible_v<std::string>);
             REQUIRE_FALSE(std::is_nothrow_copy_constructible_v<std::string>);
             REQUIRE(std::is_nothrow_move_constructible_v<std::string>);
             REQUIRE_FALSE(std::is_nothrow_copy_assignable_v<std::string>);
@@ -82,11 +82,11 @@ TEST_CASE("noexcept inheritance")
         
         using variant = rtw::variant<int, std::string, float>;
         
-        REQUIRE(std::is_nothrow_default_constructible_v<variant>);
+        REQUIRE(std::is_nothrow_default_constructible_v<variant> == std::is_nothrow_default_constructible_v<std::string>);
         REQUIRE_FALSE(std::is_nothrow_copy_constructible_v<variant>);
         REQUIRE(std::is_nothrow_move_constructible_v<variant>);
         REQUIRE_FALSE(std::is_nothrow_copy_assignable_v<variant>);
-        REQUIRE(std::is_nothrow_move_assignable_v<variant>);
+        REQUIRE(std::is_nothrow_move_assignable_v<variant> == std::is_nothrow_move_assignable_v<std::string>);
         REQUIRE(std::is_nothrow_destructible_v<variant>);
 
         REQUIRE(std::is_nothrow_constructible_v<variant, std::in_place_index_t<0>, int>);
@@ -108,7 +108,7 @@ TEST_CASE("noexcept inheritance")
         SECTION("Test the test")
         {
             REQUIRE_FALSE(std::is_nothrow_default_constructible_v<unusual>);
-            //REQUIRE(std::is_nothrow_copy_constructible_v<unusual>); // Disable test because checks alos if destructor is noexcept
+            //REQUIRE(std::is_nothrow_copy_constructible_v<unusual>); // Disable test because checks also if destructor is noexcept
             REQUIRE_FALSE(std::is_nothrow_move_constructible_v<unusual>);
             REQUIRE(std::is_nothrow_copy_assignable_v<unusual>);
             REQUIRE_FALSE(std::is_nothrow_move_assignable_v<unusual>);
@@ -118,7 +118,7 @@ TEST_CASE("noexcept inheritance")
         using variant = rtw::variant<unusual>;
 
         REQUIRE_FALSE(std::is_nothrow_default_constructible_v<variant>);
-        //REQUIRE(std::is_nothrow_copy_constructible_v<variant>); // Disable test because checks alos if destructor is noexcept
+        //REQUIRE(std::is_nothrow_copy_constructible_v<variant>); // Disable test because checks also if destructor is noexcept
         REQUIRE_FALSE(std::is_nothrow_move_constructible_v<variant>);
         REQUIRE(std::is_nothrow_copy_assignable_v<variant>);
         REQUIRE_FALSE(std::is_nothrow_move_assignable_v<variant>);
