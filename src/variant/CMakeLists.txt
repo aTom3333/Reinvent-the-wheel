@@ -1,6 +1,7 @@
 add_library(variant INTERFACE)
 target_sources(variant INTERFACE
         ${CMAKE_SOURCE_DIR}/src/variant/variant.hpp
+        ${CMAKE_SOURCE_DIR}/src/variant/detail/enable_special_method.hpp
         ${CMAKE_SOURCE_DIR}/src/variant/detail/variant_data.hpp
         ${CMAKE_SOURCE_DIR}/src/variant/detail/variant_impl.hpp
         ${CMAKE_SOURCE_DIR}/src/variant/detail/variant_storage.hpp

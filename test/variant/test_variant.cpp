@@ -127,4 +127,46 @@ TEST_CASE("noexcept inheritance")
 }
 
 
-//TEST_CASE()
+TEST_CASE("Constructibility inheritance")
+{
+    SECTION("Built-in types")
+    {
+        using variant = rtw::variant<int, float>;
+        
+        REQUIRE(std::is_default_constructible_v<variant>);
+        REQUIRE(std::is_copy_constructible_v<variant>);
+        REQUIRE(std::is_move_constructible_v<variant>);
+        REQUIRE(std::is_copy_assignable_v<variant>);
+        REQUIRE(std::is_move_assignable_v<variant>);
+        REQUIRE(std::is_destructible_v<variant>);
+
+        REQUIRE(std::is_constructible_v<variant, std::in_place_index_t<0>, int>);
+        REQUIRE(std::is_constructible_v<variant, std::in_place_index_t<1>, float>);
+    }
+    
+    SECTION("Unique pointer")
+    {
+        SECTION("Test the test")
+        {
+            REQUIRE(std::is_default_constructible_v<std::unique_ptr<int>>);
+            REQUIRE_FALSE(std::is_copy_constructible_v<std::unique_ptr<int>>);
+            REQUIRE(std::is_move_constructible_v<std::unique_ptr<int>>);
+            REQUIRE_FALSE(std::is_copy_assignable_v<std::unique_ptr<int>>);
+            REQUIRE(std::is_move_assignable_v<std::unique_ptr<int>>);
+            REQUIRE(std::is_destructible_v<std::unique_ptr<int>>);
+
+            REQUIRE(std::is_constructible_v<std::unique_ptr<int>, int*>);
+        }
+        
+        using variant = rtw::variant<std::unique_ptr<int>>;
+
+        REQUIRE(std::is_default_constructible_v<variant>);
+        REQUIRE_FALSE(std::is_copy_constructible_v<variant>);
+        REQUIRE(std::is_move_constructible_v<variant>);
+        REQUIRE_FALSE(std::is_copy_assignable_v<variant>);
+        REQUIRE(std::is_move_assignable_v<variant>);
+        REQUIRE(std::is_destructible_v<variant>);
+
+        REQUIRE(std::is_constructible_v<variant, std::in_place_index_t<0>, int*>);
+    }
+}

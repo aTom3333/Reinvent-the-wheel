@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <utility>
 #include "detail/variant_data.hpp"
+#include "detail/enable_special_method.hpp"
 
 
 namespace rtw
@@ -13,7 +14,7 @@ namespace rtw
     static constexpr const size_t variant_npos = detail::variant_npos;
     
     template<typename... Ts>
-    class variant
+    class variant : private detail::enable_special_method<Ts...>
     {
         public:
             constexpr variant() noexcept(std::is_nothrow_default_constructible_v<first_t<Ts...>>);
