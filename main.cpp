@@ -40,7 +40,7 @@ struct trivial_copy
 
 int main()
 {
-    
+    /*
     rtw::variant<watcher<1>, watcher<2>> v;
     rtw::variant<watcher<3>, watcher<4>> v2{std::in_place_index_t<1>{}};
     
@@ -63,12 +63,14 @@ int main()
     
     std::variant<std::string, bool> v4("test");
     std::cout << v4.index() << std::endl;
-
+*/
 
 
     using variant = rtw::variant<int, trivial_copy>;
     variant v10{std::in_place_index_t<1>{}};
-    variant v11{std::move(v10)};
+    variant v11{v10};
+    v10 = std::move(v11);
+    
     
     return 0;
 }

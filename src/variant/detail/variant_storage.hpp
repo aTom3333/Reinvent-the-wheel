@@ -63,7 +63,11 @@ namespace rtw::detail
     void move(variant_underlying_storage&& other, size_t i)                     \
     {                                                                           \
         if(i == Index)                                                          \
+        {                                                                       \
             ::new (&first) T{std::move(other.first)};                           \
+            other.destroy(i);                                                   \
+            other.index = variant_npos;                                         \
+        }                                                                       \
         else                                                                    \
             rest.move(std::move(other.rest), i);                                \
     }                                                                           \
@@ -74,6 +78,8 @@ namespace rtw::detail
     union variant_underlying_storage<true, Index, T, Ts...>
     {
         COMMON_VARIANT_UNDERLYING_STORAGE
+        
+        constexpr void destroy(size_t) noexcept {}
         
         T first;
         variant_storage<Index+1, Ts...> rest;

@@ -69,6 +69,9 @@ namespace rtw::detail
 
         constexpr copy_constructible_variant_underlying_data(const copy_constructible_variant_underlying_data& other)
             noexcept = default;
+        constexpr copy_constructible_variant_underlying_data(copy_constructible_variant_underlying_data&&) noexcept = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(const copy_constructible_variant_underlying_data&) = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(copy_constructible_variant_underlying_data&&) = default;
     };
 
     template<typename... Ts>
@@ -85,6 +88,10 @@ namespace rtw::detail
             base::storage.copy(other.storage, other.index);
             base::index = other.index;
         }
+
+        constexpr copy_constructible_variant_underlying_data(copy_constructible_variant_underlying_data&&) noexcept = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(const copy_constructible_variant_underlying_data&) = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(copy_constructible_variant_underlying_data&&) = default;
     };
     
     
@@ -106,8 +113,11 @@ namespace rtw::detail
 
         using base::base;
         
+        // TODO noexcept
         constexpr move_constructible_variant_underlying_data(const move_constructible_variant_underlying_data&) = default;
         constexpr move_constructible_variant_underlying_data(move_constructible_variant_underlying_data&&) = default;
+        constexpr move_constructible_variant_underlying_data& operator=(const move_constructible_variant_underlying_data&) = default;
+        constexpr move_constructible_variant_underlying_data& operator=(move_constructible_variant_underlying_data&&) noexcept = default;
     };
 
     template<typename... Ts>
@@ -126,6 +136,9 @@ namespace rtw::detail
             base::storage.move(std::move(other.storage), other.index);
             base::index = other.index;
         }
+
+        constexpr move_constructible_variant_underlying_data& operator=(const move_constructible_variant_underlying_data&) = default;
+        constexpr move_constructible_variant_underlying_data& operator=(move_constructible_variant_underlying_data&&) noexcept = default;
     };
     
     
@@ -138,6 +151,92 @@ namespace rtw::detail
         (std::is_trivially_copy_assignable_v<Ts> && ...),
         Ts...
     >;
+    
+    template<typename... Ts>
+    struct copy_assignable_variant_underlying_data<true, Ts...> : move_constructible_variant_data<Ts...>
+    {
+        using base = move_constructible_variant_data<Ts...>;
+        
+        using base::base;
+
+        //static_assert((std::is_trivial_v<Ts> && ...), "coucou");
+
+        // TODO noexcept
+        copy_assignable_variant_underlying_data(const copy_assignable_variant_underlying_data&) = default;
+        copy_assignable_variant_underlying_data(copy_assignable_variant_underlying_data&&) = default;
+        copy_assignable_variant_underlying_data& operator=(const copy_assignable_variant_underlying_data&) = default;
+        copy_assignable_variant_underlying_data& operator=(copy_assignable_variant_underlying_data&&) = default;
+    };
+
+    template<typename... Ts>
+    struct copy_assignable_variant_underlying_data<false, Ts...> : move_constructible_variant_data<Ts...>
+    {
+        using base = move_constructible_variant_data<Ts...>;
+
+        using base::base;
+
+        // TODO noexcept
+        copy_assignable_variant_underlying_data(const copy_assignable_variant_underlying_data&) = default;
+        copy_assignable_variant_underlying_data(copy_assignable_variant_underlying_data&&) = default;
+
+        copy_assignable_variant_underlying_data& operator=(const copy_assignable_variant_underlying_data& other)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...))
+        {
+            base::storage.destroy(base::index);
+            base::index = variant_npos;
+            base::storage.copy(other.storage, other.index);
+            base::index = other.index;
+            
+            return *this;
+        }
+
+        copy_assignable_variant_underlying_data& operator=(copy_assignable_variant_underlying_data&&) = default;
+    };
+    
+    
+    // Add move-assignment
+    template<bool trivially_move_assignable, typename... Ts>
+    struct move_assignable_variant_underlying_data;
+    
+    template<typename... Ts>
+    using move_assignable_variant_data = move_assignable_variant_underlying_data<
+        (std::is_trivially_move_assignable_v<Ts> && ...),
+        Ts...
+    >;
+    
+    template<typename... Ts>
+    struct move_assignable_variant_underlying_data<true, Ts...> : copy_assignable_variant_data<Ts...>
+    {
+        using base = copy_assignable_variant_data<Ts...>;
+        
+        // TODO noexcept
+        move_assignable_variant_underlying_data(const move_assignable_variant_underlying_data&) = default;
+        move_assignable_variant_underlying_data(move_assignable_variant_underlying_data&&) = default;
+        move_assignable_variant_underlying_data& operator=(const move_assignable_variant_underlying_data&) = default;
+        move_assignable_variant_underlying_data& operator=(move_assignable_variant_underlying_data&&) noexcept = default;
+    };
+
+    template<typename... Ts>
+    struct move_assignable_variant_underlying_data<false, Ts...> : copy_assignable_variant_data<Ts...>
+    {
+        using base = copy_assignable_variant_data<Ts...>;
+        
+        // TODO noexcept
+        move_assignable_variant_underlying_data(const move_assignable_variant_underlying_data&) = default;
+        move_assignable_variant_underlying_data(move_assignable_variant_underlying_data&&) = default;
+        move_assignable_variant_underlying_data& operator=(const move_assignable_variant_underlying_data&) = default;
+        
+        move_assignable_variant_underlying_data& operator=(move_assignable_variant_underlying_data&& other)
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...))
+        {
+            base::storage.destroy(base::index);
+            base::index = variant_npos;
+            base::storage.move(std::move(other.storage), other.index);
+            base::index = other.index;
+            
+            return *this;
+        }
+    };
 }
 
 #endif // VARIANT_DATA_HPP

@@ -21,6 +21,8 @@ namespace rtw
             constexpr variant(const variant& other) = default;
             // TODO noexcept
             constexpr variant(variant&& other) noexcept = default;
+            constexpr variant& operator=(const variant&) = default;
+            constexpr variant& operator=(variant&&) = default;
             
             template<size_t I, typename... Args>
             constexpr explicit variant(std::in_place_index_t<I>, Args&&... args) noexcept(std::is_nothrow_constructible_v<get_type_t<I, Ts...>, Args...>);
@@ -28,7 +30,7 @@ namespace rtw
             constexpr size_t index() const noexcept;
             
         private:
-            using data_t = rtw::detail::move_constructible_variant_data<Ts...>;
+            using data_t = rtw::detail::move_assignable_variant_data<Ts...>;
             data_t data;
     };
 }
