@@ -64,23 +64,22 @@ namespace rtw::detail
     struct copy_constructible_variant_underlying_data<true, Ts...> : variant_data<Ts...>
     {
         using base = variant_data<Ts...>;
-
-        using base::base;
-
+        
         constexpr copy_constructible_variant_underlying_data(const copy_constructible_variant_underlying_data& other)
-            noexcept = default;
-        constexpr copy_constructible_variant_underlying_data(copy_constructible_variant_underlying_data&&) noexcept = default;
-        constexpr copy_constructible_variant_underlying_data& operator=(const copy_constructible_variant_underlying_data&) = default;
-        constexpr copy_constructible_variant_underlying_data& operator=(copy_constructible_variant_underlying_data&&) = default;
+            noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
+        constexpr copy_constructible_variant_underlying_data(copy_constructible_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(const copy_constructible_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(copy_constructible_variant_underlying_data&&)
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
     };
 
     template<typename... Ts>
     struct copy_constructible_variant_underlying_data<false, Ts...> : variant_data<Ts...>
     {
         using base = variant_data<Ts...>;
-
-        using base::base;
-
+        
         constexpr copy_constructible_variant_underlying_data(const copy_constructible_variant_underlying_data& other)
             noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...))
         {
@@ -89,9 +88,12 @@ namespace rtw::detail
             base::index = other.index;
         }
 
-        constexpr copy_constructible_variant_underlying_data(copy_constructible_variant_underlying_data&&) noexcept = default;
-        constexpr copy_constructible_variant_underlying_data& operator=(const copy_constructible_variant_underlying_data&) = default;
-        constexpr copy_constructible_variant_underlying_data& operator=(copy_constructible_variant_underlying_data&&) = default;
+        constexpr copy_constructible_variant_underlying_data(copy_constructible_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(const copy_constructible_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
+        constexpr copy_constructible_variant_underlying_data& operator=(copy_constructible_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
     };
     
     
@@ -110,14 +112,15 @@ namespace rtw::detail
     struct move_constructible_variant_underlying_data<true, Ts...> : copy_constructible_variant_data<Ts...>
     {
         using base = copy_constructible_variant_data<Ts...>;
-
-        using base::base;
         
-        // TODO noexcept
-        constexpr move_constructible_variant_underlying_data(const move_constructible_variant_underlying_data&) = default;
-        constexpr move_constructible_variant_underlying_data(move_constructible_variant_underlying_data&&) = default;
-        constexpr move_constructible_variant_underlying_data& operator=(const move_constructible_variant_underlying_data&) = default;
-        constexpr move_constructible_variant_underlying_data& operator=(move_constructible_variant_underlying_data&&) noexcept = default;
+        constexpr move_constructible_variant_underlying_data(const move_constructible_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
+        constexpr move_constructible_variant_underlying_data(move_constructible_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
+        constexpr move_constructible_variant_underlying_data& operator=(const move_constructible_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
+        constexpr move_constructible_variant_underlying_data& operator=(move_constructible_variant_underlying_data&&)
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
     };
 
     template<typename... Ts>
@@ -125,9 +128,8 @@ namespace rtw::detail
     {
         using base = copy_constructible_variant_data<Ts...>;
         
-        using base::base;
-        
-        constexpr move_constructible_variant_underlying_data(const move_constructible_variant_underlying_data&) = default;
+        constexpr move_constructible_variant_underlying_data(const move_constructible_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
 
         constexpr move_constructible_variant_underlying_data(move_constructible_variant_underlying_data&& other)
             noexcept((std::is_nothrow_move_constructible_v<Ts> && ...))
@@ -137,8 +139,10 @@ namespace rtw::detail
             base::index = other.index;
         }
 
-        constexpr move_constructible_variant_underlying_data& operator=(const move_constructible_variant_underlying_data&) = default;
-        constexpr move_constructible_variant_underlying_data& operator=(move_constructible_variant_underlying_data&&) noexcept = default;
+        constexpr move_constructible_variant_underlying_data& operator=(const move_constructible_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
+        constexpr move_constructible_variant_underlying_data& operator=(move_constructible_variant_underlying_data&&)
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
     };
     
     
@@ -157,27 +161,25 @@ namespace rtw::detail
     {
         using base = move_constructible_variant_data<Ts...>;
         
-        using base::base;
-
-        //static_assert((std::is_trivial_v<Ts> && ...), "coucou");
-
-        // TODO noexcept
-        copy_assignable_variant_underlying_data(const copy_assignable_variant_underlying_data&) = default;
-        copy_assignable_variant_underlying_data(copy_assignable_variant_underlying_data&&) = default;
-        copy_assignable_variant_underlying_data& operator=(const copy_assignable_variant_underlying_data&) = default;
-        copy_assignable_variant_underlying_data& operator=(copy_assignable_variant_underlying_data&&) = default;
+        copy_assignable_variant_underlying_data(const copy_assignable_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
+        copy_assignable_variant_underlying_data(copy_assignable_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
+        copy_assignable_variant_underlying_data& operator=(const copy_assignable_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
+        copy_assignable_variant_underlying_data& operator=(copy_assignable_variant_underlying_data&&)
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
     };
 
     template<typename... Ts>
     struct copy_assignable_variant_underlying_data<false, Ts...> : move_constructible_variant_data<Ts...>
     {
         using base = move_constructible_variant_data<Ts...>;
-
-        using base::base;
-
-        // TODO noexcept
-        copy_assignable_variant_underlying_data(const copy_assignable_variant_underlying_data&) = default;
-        copy_assignable_variant_underlying_data(copy_assignable_variant_underlying_data&&) = default;
+        
+        copy_assignable_variant_underlying_data(const copy_assignable_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
+        copy_assignable_variant_underlying_data(copy_assignable_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
 
         copy_assignable_variant_underlying_data& operator=(const copy_assignable_variant_underlying_data& other)
             noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...))
@@ -190,7 +192,8 @@ namespace rtw::detail
             return *this;
         }
 
-        copy_assignable_variant_underlying_data& operator=(copy_assignable_variant_underlying_data&&) = default;
+        copy_assignable_variant_underlying_data& operator=(copy_assignable_variant_underlying_data&&)
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
     };
     
     
@@ -209,11 +212,14 @@ namespace rtw::detail
     {
         using base = copy_assignable_variant_data<Ts...>;
         
-        // TODO noexcept
-        move_assignable_variant_underlying_data(const move_assignable_variant_underlying_data&) = default;
-        move_assignable_variant_underlying_data(move_assignable_variant_underlying_data&&) = default;
-        move_assignable_variant_underlying_data& operator=(const move_assignable_variant_underlying_data&) = default;
-        move_assignable_variant_underlying_data& operator=(move_assignable_variant_underlying_data&&) noexcept = default;
+        move_assignable_variant_underlying_data(const move_assignable_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
+        move_assignable_variant_underlying_data(move_assignable_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
+        move_assignable_variant_underlying_data& operator=(const move_assignable_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
+        move_assignable_variant_underlying_data& operator=(move_assignable_variant_underlying_data&&)
+            noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
     };
 
     template<typename... Ts>
@@ -221,10 +227,12 @@ namespace rtw::detail
     {
         using base = copy_assignable_variant_data<Ts...>;
         
-        // TODO noexcept
-        move_assignable_variant_underlying_data(const move_assignable_variant_underlying_data&) = default;
-        move_assignable_variant_underlying_data(move_assignable_variant_underlying_data&&) = default;
-        move_assignable_variant_underlying_data& operator=(const move_assignable_variant_underlying_data&) = default;
+        move_assignable_variant_underlying_data(const move_assignable_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
+        move_assignable_variant_underlying_data(move_assignable_variant_underlying_data&&) 
+            noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
+        move_assignable_variant_underlying_data& operator=(const move_assignable_variant_underlying_data&)
+            noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
         
         move_assignable_variant_underlying_data& operator=(move_assignable_variant_underlying_data&& other)
             noexcept((std::is_nothrow_move_assignable_v<Ts> && ...))

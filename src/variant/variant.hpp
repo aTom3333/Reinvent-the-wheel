@@ -18,11 +18,10 @@ namespace rtw
         public:
             constexpr variant() noexcept(std::is_nothrow_default_constructible_v<first_t<Ts...>>);
             
-            constexpr variant(const variant& other) = default;
-            // TODO noexcept
-            constexpr variant(variant&& other) noexcept = default;
-            constexpr variant& operator=(const variant&) = default;
-            constexpr variant& operator=(variant&&) = default;
+            constexpr variant(const variant& other) noexcept((std::is_nothrow_copy_constructible_v<Ts> && ...)) = default;
+            constexpr variant(variant&& other) noexcept((std::is_nothrow_move_constructible_v<Ts> && ...)) = default;
+            constexpr variant& operator=(const variant&) noexcept((std::is_nothrow_copy_assignable_v<Ts> && ...)) = default;
+            constexpr variant& operator=(variant&&) noexcept((std::is_nothrow_move_assignable_v<Ts> && ...)) = default;
             
             template<size_t I, typename... Args>
             constexpr explicit variant(std::in_place_index_t<I>, Args&&... args) noexcept(std::is_nothrow_constructible_v<get_type_t<I, Ts...>, Args...>);
