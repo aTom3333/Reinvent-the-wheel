@@ -49,3 +49,82 @@ TEST_CASE("Triviality inheritance")
     }
     
 }
+
+
+TEST_CASE("noexcept inheritance")
+{
+    SECTION("Built-in types")
+    {
+        using variant = rtw::variant<int, float>;
+
+        REQUIRE(std::is_nothrow_default_constructible_v<variant>);
+        REQUIRE(std::is_nothrow_copy_constructible_v<variant>);
+        REQUIRE(std::is_nothrow_move_constructible_v<variant>);
+        REQUIRE(std::is_nothrow_copy_assignable_v<variant>);
+        REQUIRE(std::is_nothrow_move_assignable_v<variant>);
+        REQUIRE(std::is_nothrow_destructible_v<variant>);
+
+        REQUIRE(std::is_nothrow_constructible_v<variant, std::in_place_index_t<0>, int>);
+        REQUIRE(std::is_nothrow_constructible_v<variant, std::in_place_index_t<1>, float>);
+    }
+    
+    SECTION("String")
+    {
+        SECTION("Test the test")
+        {
+            REQUIRE(std::is_nothrow_default_constructible_v<std::string>);
+            REQUIRE_FALSE(std::is_nothrow_copy_constructible_v<std::string>);
+            REQUIRE(std::is_nothrow_move_constructible_v<std::string>);
+            REQUIRE_FALSE(std::is_nothrow_copy_assignable_v<std::string>);
+            REQUIRE(std::is_nothrow_move_assignable_v<std::string>);
+            REQUIRE(std::is_nothrow_destructible_v<std::string>);
+        }
+        
+        using variant = rtw::variant<int, std::string, float>;
+        
+        REQUIRE(std::is_nothrow_default_constructible_v<variant>);
+        REQUIRE_FALSE(std::is_nothrow_copy_constructible_v<variant>);
+        REQUIRE(std::is_nothrow_move_constructible_v<variant>);
+        REQUIRE_FALSE(std::is_nothrow_copy_assignable_v<variant>);
+        REQUIRE(std::is_nothrow_move_assignable_v<variant>);
+        REQUIRE(std::is_nothrow_destructible_v<variant>);
+
+        REQUIRE(std::is_nothrow_constructible_v<variant, std::in_place_index_t<0>, int>);
+        REQUIRE_FALSE(std::is_nothrow_constructible_v<variant, std::in_place_index_t<1>, const char*>);
+        REQUIRE(std::is_nothrow_constructible_v<variant, std::in_place_index_t<2>, float>);
+    }
+    
+    SECTION("Unusual behaviour")
+    {
+        struct unusual {
+            unusual() noexcept(false) {};
+            unusual(const unusual&) noexcept {};
+            unusual(unusual&&) noexcept(false) {};
+            unusual& operator=(const unusual&) noexcept { return *this; }
+            unusual& operator=(unusual&&) noexcept(false) { return *this; }
+            ~unusual() noexcept(false) {}
+        };
+        
+        SECTION("Test the test")
+        {
+            REQUIRE_FALSE(std::is_nothrow_default_constructible_v<unusual>);
+            //REQUIRE(std::is_nothrow_copy_constructible_v<unusual>); // Disable test because checks alos if destructor is noexcept
+            REQUIRE_FALSE(std::is_nothrow_move_constructible_v<unusual>);
+            REQUIRE(std::is_nothrow_copy_assignable_v<unusual>);
+            REQUIRE_FALSE(std::is_nothrow_move_assignable_v<unusual>);
+            REQUIRE_FALSE(std::is_nothrow_destructible_v<unusual>);
+        }
+        
+        using variant = rtw::variant<unusual>;
+
+        REQUIRE_FALSE(std::is_nothrow_default_constructible_v<variant>);
+        //REQUIRE(std::is_nothrow_copy_constructible_v<variant>); // Disable test because checks alos if destructor is noexcept
+        REQUIRE_FALSE(std::is_nothrow_move_constructible_v<variant>);
+        REQUIRE(std::is_nothrow_copy_assignable_v<variant>);
+        REQUIRE_FALSE(std::is_nothrow_move_assignable_v<variant>);
+        REQUIRE_FALSE(std::is_nothrow_destructible_v<variant>);
+    }
+}
+
+
+//TEST_CASE()
